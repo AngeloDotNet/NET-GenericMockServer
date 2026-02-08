@@ -1,32 +1,59 @@
 # .NET 8 Minimal API Mock Server
 
+MockServer extension with FluentValidation, AutoMapper, versioning and logging middleware
+
 ## 🛠️ Dependencies
 
-- .NET 8 SDK
-- Microsoft.EntityFrameworkCore.Sqlite
-- Bogus
+- .NET 8 Minimal API
+- EF Core + SQLite (file-based)
+- Bogus for seed data
+- AutoMapper for DTO <-> Entity mapping
+- FluentValidation for DTO validation
+- Custom middleware for logging request/response
+- URL-based API versioning (e.g. /api/v1/)
+- Example of complex entities: 
+  - Customer 1:N Order 
+  - Product many-to-many Tag (join ProductTag)
 
-## 📚 Endpoints (examples after startup)
+## 📚 Endpoints
+
+### Entity: Product
 
 | Method | Endpoint |
 |--------|----------|
-| GET | /api/products |
-| GET | /api/products/{id} |
-| POST | /api/products |
-| PUT | /api/products/{id} |
-| DELETE | /api/products/{id} |
+| GET | /api/v1/products |
+| GET | /api/v1/products/{id} |
+| POST | /api/v1/products |
+| PUT | /api/v1/products/{id} |
+| DELETE | /api/v1/products/{id} |
+
+### Entity: Customer
+
+| Method | Endpoint |
+|--------|----------|
+| GET | /api/v1/customers
+| POST | /api/v1/customers
+
+### Entity: Order
+
+| Method | Endpoint |
+|--------|----------|
+| GET | /api/v1/orders
+| POST | /api/v1/orders
 
 ## ⚙️ How to extend with a new entity
 
-1. Add the class in Models (inherit EntityBase or add long Id property).
-2. Register the entity in the AppDbContext (modelBuilder.Entity<YourEntity>();).
-3. (Optional) Implement IEntityFaker<YourEntity> for the specific faker and register it in Services.
-4. In Program.cs, add `app.MapEntityEndpoints<YourEntity>("yourentities");`
+1. Add a new entity in Models and register it in AppDbContext (OnModelCreating if configuration is needed).
+2. Add DTO and AutoMapper mappings (MappingProfile).
+3. Add a FluentValidation validator for Create/Update DTO.
+4. (Optional) Register IEntityFaker<T> for better seeding.
+5. Add routing by calling the MapEntityEndpoints function or creating custom endpoints if include/relationships are needed.
 
 ## 💡 Note
 
-- The GenericRepository uses DbContext.Set<T>() and FindAsync(id) to search by ID; if your entity uses a different pk name, adjust the repository.
-- The DefaultEntityFaker attempts to populate common properties (string, number, DateTime). You can override it by registering a type-specific faker.
+- The generic Update copies all writable properties except Id. For more complex cases, create specific endpoints or use specific DTOs.
+- For validation in the minimal API routes, I used IValidator<T> and Output Results.ValidationProblem when validation fails.
+- The logging middleware records the request and response body—be careful with sensitive data in production.
 
 ## 📜 License
 
