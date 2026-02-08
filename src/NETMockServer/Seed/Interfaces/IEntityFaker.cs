@@ -1,4 +1,4 @@
-﻿namespace NETMockServer.Seed.Interfaces;
+namespace NETMockServer.Seed.Interfaces;
 
 public interface IEntityFaker<T> where T : class
 {
