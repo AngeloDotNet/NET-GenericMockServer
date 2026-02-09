@@ -1,4 +1,4 @@
-﻿namespace NETMockServer.Entities;
+namespace NETMockServer.Entities;
 
 public class Product : EntityBase
 {
@@ -6,4 +6,7 @@ public class Product : EntityBase
     public string? Description { get; set; }
     public decimal Price { get; set; }
     public DateTime CreatedAt { get; set; }
+
+    // Many-to-many via join entity
+    public ICollection<ProductTag> ProductTags { get; set; } = new List<ProductTag>();
 }
