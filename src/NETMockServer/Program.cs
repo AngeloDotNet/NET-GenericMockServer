@@ -30,10 +30,7 @@ public class Program
             options.SerializerOptions.Converters.Add(new JsonStringEnumConverter());
         });
 
-        //builder.Services.AddEndpointsApiExplorer();
-        //builder.Services.AddSwaggerGen(options => options.SwaggerDoc("v1", new OpenApiInfo { Title = "API v1", Version = "v1" }));
         builder.Services.AddOpenApi();
-
         builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlite(builder.Configuration.GetConnectionString("Default")));
 
         // Repositories
@@ -60,12 +57,9 @@ public class Program
         app.UseMiddleware<RequestResponseLoggingMiddleware>();
 
         var appName = app.Environment.ApplicationName;
-        //var swaggerJson = "/swagger/v1/swagger.json";
         var swaggerJson = "/openapi/v1.json";
         var swaggerTitle = string.IsNullOrWhiteSpace(appName) ? "API v1" : $"{appName} v1";
 
-        //app.UseSwagger();
-        //app.UseSwaggerUI(options => options.SwaggerEndpoint(swaggerJson, swaggerTitle));
         app.MapOpenApi();
         app.MapSwaggerUI("", options => options.SwaggerEndpoint(swaggerJson, swaggerTitle));
 
