@@ -2,7 +2,6 @@ using System.Text.Json.Serialization;
 using AutoMapper;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.OpenApi.Models;
 using MockServer.Seed;
 using NETMockServer.Data;
 using NETMockServer.DTOs;
@@ -31,8 +30,9 @@ public class Program
             options.SerializerOptions.Converters.Add(new JsonStringEnumConverter());
         });
 
-        builder.Services.AddEndpointsApiExplorer();
-        builder.Services.AddSwaggerGen(options => options.SwaggerDoc("v1", new OpenApiInfo { Title = "API v1", Version = "v1" }));
+        //builder.Services.AddEndpointsApiExplorer();
+        //builder.Services.AddSwaggerGen(options => options.SwaggerDoc("v1", new OpenApiInfo { Title = "API v1", Version = "v1" }));
+        builder.Services.AddOpenApi();
 
         builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlite(builder.Configuration.GetConnectionString("Default")));
 
@@ -60,11 +60,14 @@ public class Program
         app.UseMiddleware<RequestResponseLoggingMiddleware>();
 
         var appName = app.Environment.ApplicationName;
-        var swaggerJson = "/swagger/v1/swagger.json";
+        //var swaggerJson = "/swagger/v1/swagger.json";
+        var swaggerJson = "/openapi/v1.json";
         var swaggerTitle = string.IsNullOrWhiteSpace(appName) ? "API v1" : $"{appName} v1";
 
-        app.UseSwagger();
-        app.UseSwaggerUI(options => options.SwaggerEndpoint(swaggerJson, swaggerTitle));
+        //app.UseSwagger();
+        //app.UseSwaggerUI(options => options.SwaggerEndpoint(swaggerJson, swaggerTitle));
+        app.MapOpenApi();
+        app.MapSwaggerUI("", options => options.SwaggerEndpoint(swaggerJson, swaggerTitle));
 
         // Ensure DB + seed
         using (var scope = app.Services.CreateScope())
